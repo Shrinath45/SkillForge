@@ -34,6 +34,7 @@ import Acourses from "./admin/Courses/AdminCourses.jsx";
 import MyLearning from "./learner/Learnings/MyLearning.jsx";
 import LearnerCourses from "./learner/Courses/Lcourses.jsx";
 import LearnerDashboard from "./learner/dashboard/Ldashboard.jsx";
+import ViewEnrollments from "./instructor/Courses/ViewEnrollments.jsx";
 
 
 // Define router
@@ -64,6 +65,8 @@ const router = createBrowserRouter(
       <Route path="/my-learning" element={<ProtectedRoute><MyLearning /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
       <Route path="/add-course" element={<ProtectedRoute><AddCourse /></ProtectedRoute>} />
+      <Route path="/view-enrollments/:course_id" element={<ProtectedRoute><ViewEnrollments /></ProtectedRoute>} />
+
 
       {/* Catch-all route */}''
       <Route path="*" element={<ErrorPage />} />

@@ -2,10 +2,12 @@ import React, { useState } from 'react'
 import CourseDialog from './CourseDialog';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 const CardContent = ({ course, onDelete }) => {
 
     const token = sessionStorage.getItem("token");
+    const navigate = useNavigate();
 
 
     const [open, setOpen] = useState(false);
@@ -55,7 +57,11 @@ const CardContent = ({ course, onDelete }) => {
         return status.charAt(0) + status.slice(1).toLowerCase();
     };
 
-
+     const handleViewEnrollments = () => {
+        navigate(
+            `/view-enrollments/${course.course_id}`
+        );
+    };
 
 
     return (
@@ -112,6 +118,14 @@ const CardContent = ({ course, onDelete }) => {
                         setOpen(true);
                     }} className="w-full mt-4 bg-emerald-500 hover:bg-emerald-600 text-black font-medium py-2 rounded-lg">
                         View Details
+                    </button>
+                    <button
+                        onClick={
+                            handleViewEnrollments
+                        }
+                        className="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition"
+                    >
+                        View Enrollments
                     </button>
                     <button onClick={deleteClick} className="w-full mt-4 bg-red-900 hover:bg-red-800 text-black font-medium py-2 rounded-lg">
                         Delete Course

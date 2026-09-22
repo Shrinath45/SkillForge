@@ -1,383 +1,814 @@
+// import React, { useRef, useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import {
+//     Grid,
+//     Box,
+//     Avatar,
+//     Typography,
+//     IconButton,
+//     Link,
+//     Paper,
+//     Dialog,
+//     DialogTitle,
+//     DialogContent,
+//     DialogActions,
+//     Button,
+//     TextField,
+//     Divider
+// } from "@mui/material";
+// import EditIcon from "@mui/icons-material/Edit";
+// import PhoneIcon from "@mui/icons-material/Phone";
+// import LocationOnIcon from "@mui/icons-material/LocationOn";
+// import InfoIcon from "@mui/icons-material/Info";
+// import axios from "axios";
+// import toast from "react-hot-toast";
+// import Aheader from "../Header/Aheader";
+
+// function Aprofile() {
+//     const navigate = useNavigate();
+//     const storedUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
+//     const [user, setUser] = useState(storedUser);
+
+//     const [profilePic, setProfilePic] = useState(user?.profile_photo || "");
+//     const [openEditProfile, setOpenEditProfile] = useState(false);
+//     const [openChangePassword, setOpenChangePassword] = useState(false);
+
+//     const [name, setName] = useState(user?.name || "");
+//     const [email, setEmail] = useState(user?.email || "");
+//     const [phone, setPhone] = useState(user?.phone || "");
+//     const [city, setCity] = useState(user?.city || "");
+//     const [bio, setBio] = useState(user?.bio || "");
+
+//     const [newPassword, setNewPassword] = useState("");
+//     const [confirmPassword, setConfirmPassword] = useState("");
+//     const [passwordError, setPasswordError] = useState("");
+//     const [confirmPasswordError, setConfirmPasswordError] = useState("");
+
+//     const fileInputRef = useRef();
+
+//     // ✅ Trigger file input for photo change
+//     const handleEditPhoto = () => {
+//         fileInputRef.current.click();
+//     };
+
+//     const handleFileChange = async (e) => {
+//         const file = e.target.files[0];
+//         if (!file) return;
+
+//         const formData = new FormData();
+//         formData.append("profilePhoto", file);
+//         formData.append("email", user.email);
+
+//         try {
+//             const response = await axios.put(
+//                 "http://localhost:5000/api/auth/update-profile-pic",
+//                 formData,
+//                 { headers: { "Content-Type": "multipart/form-data" } }
+//             );
+
+//             if (response.data.success) {
+//                 const imageUrl = response.data.profile_photo;
+
+//                 setProfilePic(imageUrl);
+
+//                 const updatedUser = { ...user, profile_photo: imageUrl };
+//                 sessionStorage.setItem("loggedInUser", JSON.stringify(updatedUser));
+//                 setUser(updatedUser);
+
+//                 toast.success("Profile photo updated successfully!");
+//             } else {
+//                 toast.error(response.data.message || "Failed to update profile photo.");
+//             }
+//         } catch (error) {
+//             toast.error(error.response?.data?.message || "Failed to update profile photo.");
+//         }
+//     };
+
+//     // ✅ Validate and update profile info
+//     const handleProfileUpdate = async () => {
+//     if (!name || !email) {
+//         toast.error("Name and Email are required");
+//         return;
+//     }
+
+//     try {
+//         const response = await axios.put(
+//             "http://localhost:5000/api/auth/update-profile",
+//             { name, email, phone, city, bio },
+//             { headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` } }
+//         );
+
+//         if (response.data.success) {
+//             const updatedUser = response.data.user; // ✅ get updated user from backend
+
+//             // ✅ Update local state & sessionStorage
+//             sessionStorage.setItem("loggedInUser", JSON.stringify(updatedUser));
+//             setUser(updatedUser);
+
+//             setOpenEditProfile(false);
+//             toast.success("Profile updated successfully!");
+//         } else {
+//             toast.error(response.data.message || "Failed to update profile.");
+//         }
+//     } catch (error) {
+//         toast.error(error.response?.data?.message || "Failed to update profile.");
+//     }
+// };
+
+
+//     // ✅ Validate and update password
+//     const handlePasswordChange = async () => {
+//         if (!newPassword) {
+//             setPasswordError("Password is required");
+//             return;
+//         } else if (newPassword.length < 6) {
+//             setPasswordError("Password must be at least 6 characters");
+//             return;
+//         } else {
+//             setPasswordError("");
+//         }
+
+//         if (!confirmPassword) {
+//             setConfirmPasswordError("Please confirm your password");
+//             return;
+//         } else if (confirmPassword !== newPassword) {
+//             setConfirmPasswordError("Passwords do not match");
+//             return;
+//         } else {
+//             setConfirmPasswordError("");
+//         }
+
+//         try {
+//             const response = await axios.put("http://localhost:5000/api/auth/change-password", {
+//                 email: user.email,
+//                 newPassword
+//             });
+
+//             if (response.data.success) {
+//                 setOpenChangePassword(false);
+//                 setNewPassword("");
+//                 setConfirmPassword("");
+//                 toast.success("Password changed successfully!");
+//             } else {
+//                 toast.error(response.data.message || "Failed to change password.");
+//             }
+//         } catch (error) {
+//             toast.error(error.response?.data?.message || "Failed to change password.");
+//         }
+//     };
+
+//     return (
+//         <>
+//             <Aheader />
+//             <Box sx={{ p: 4 }}>
+//                 <Paper
+//                     elevation={4}
+//                     sx={{
+//                         p: 4,
+//                         maxWidth: 1000,
+//                         mx: "auto",
+//                         borderRadius: 3,
+//                         background: "linear-gradient(135deg, #f9f9f9, #ffffff)",
+//                     }}
+//                 >
+//                     <Grid container spacing={4} alignItems="center">
+//                         {/* LEFT SIDE - Profile Picture */}
+//                         <Grid item xs={12} sm={6} sx={{ display: "flex", justifyContent: "center", position: "relative" }}>
+//                             <Avatar
+//                                 alt="Profile"
+//                                 src={profilePic || "/default-avatar.png"}
+//                                 sx={{ width: 220, height: 220, boxShadow: 3 }}
+//                             />
+//                             <IconButton
+//                                 color="primary"
+//                                 onClick={handleEditPhoto}
+//                                 sx={{
+//                                     position: "absolute",
+//                                     bottom: 10,
+//                                     width: "50px",
+//                                     marginLeft: "80px",
+//                                     backgroundColor: "white",
+//                                     boxShadow: 5,
+//                                     "&:hover": { backgroundColor: "#f0f0f0" },
+//                                 }}
+//                             >
+//                                 <EditIcon />
+//                             </IconButton>
+//                             <input
+//                                 type="file"
+//                                 accept="image/*"
+//                                 ref={fileInputRef}
+//                                 style={{ display: "none" }}
+//                                 onChange={handleFileChange}
+//                             />
+//                         </Grid>
+
+//                         {/* RIGHT SIDE - User Details */}
+//                         <Grid item xs={12} sm={6}>
+//                             <Typography variant="h4" fontWeight="bold" sx={{ mb: 1 }}>
+//                                 {name}
+//                             </Typography>
+//                             <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+//                                 {email}
+//                             </Typography>
+
+//                             {/* Contact Info */}
+//                             <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+//                                 <PhoneIcon color="primary" sx={{ mr: 1 }} />
+//                                 <Typography variant="body1">
+//                                     {phone || "No phone added"}
+//                                 </Typography>
+//                                 <Divider orientation="vertical" flexItem sx={{ mx: 2 }} />
+//                                 <LocationOnIcon color="error" sx={{ mr: 1 }} />
+//                                 <Typography variant="body1">
+//                                     {city || "No city added"}
+//                                 </Typography>
+//                             </Box>
+
+//                             {/* Bio */}
+//                             <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
+//                                 <InfoIcon color="action" sx={{ mr: 1 }} />
+//                                 <Typography variant="body2" fontStyle="italic">
+//                                     {bio || "No bio added yet"}
+//                                 </Typography>
+//                             </Box>
+
+//                             {/* Links */}
+//                             <Box sx={{ display: "flex", flexDirection: "row", gap: 3, mt: 3 }}>
+//                                 <Link underline="hover" variant="body1" onClick={() => setOpenEditProfile(true)} sx={{ cursor: "pointer" }}>
+//                                     Edit Profile
+//                                 </Link>
+//                                 <Link underline="hover" variant="body1" onClick={() => setOpenChangePassword(true)} sx={{ cursor: "pointer" }}>
+//                                     Change Password
+//                                 </Link>
+//                             </Box>
+//                         </Grid>
+//                     </Grid>
+//                 </Paper>
+//             </Box>
+
+
+
+
+
+//             {/* Edit Profile Dialog */}
+//             <Dialog open={openEditProfile} onClose={() => setOpenEditProfile(false)}>
+//                 <DialogTitle>Edit Profile</DialogTitle>
+//                 <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+//                     <TextField
+//                         label="Name"
+//                         value={name}
+//                         onChange={(e) => setName(e.target.value)}
+//                         fullWidthxa
+//                     />
+//                     <TextField
+//                         label="Email"
+//                         value={email}
+//                         onChange={(e) => setEmail(e.target.value)}
+//                         fullWidth
+//                     />
+//                     <TextField
+//                         label="Phone"
+//                         value={phone}
+//                         onChange={(e) => setPhone(e.target.value)}
+//                         fullWidth
+//                     />
+//                     <TextField
+//                         label="City"
+//                         value={city}
+//                         onChange={(e) => setCity(e.target.value)}
+//                         fullWidth
+//                     />
+//                     <TextField
+//                         label="Bio"
+//                         value={bio}
+//                         onChange={(e) => setBio(e.target.value)}
+//                         fullWidth
+//                         multiline
+//                         rows={3}
+//                     />
+//                 </DialogContent>
+//                 <DialogActions>
+//                     <Button onClick={() => setOpenEditProfile(false)}>Cancel</Button>
+//                     <Button variant="contained" onClick={handleProfileUpdate}>
+//                         Save
+//                     </Button>
+//                 </DialogActions>
+//             </Dialog>
+
+//             {/* Change Password Dialog */}
+//             <Dialog open={openChangePassword} onClose={() => setOpenChangePassword(false)}>
+//                 <DialogTitle>Change Password</DialogTitle>
+//                 <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
+//                     <TextField
+//                         label="New Password"
+//                         type="password"
+//                         value={newPassword}
+//                         onChange={(e) => setNewPassword(e.target.value)}
+//                         error={!!passwordError}
+//                         helperText={passwordError}
+//                         fullWidth
+//                     />
+//                     <TextField
+//                         label="Confirm New Password"
+//                         type="password"
+//                         value={confirmPassword}
+//                         onChange={(e) => setConfirmPassword(e.target.value)}
+//                         error={!!confirmPasswordError}
+//                         helperText={confirmPasswordError}
+//                         fullWidth
+//                     />
+//                 </DialogContent>
+//                 <DialogActions>
+//                     <Button onClick={() => setOpenChangePassword(false)}>Cancel</Button>
+//                     <Button variant="contained" onClick={handlePasswordChange}>
+//                         Update
+//                     </Button>
+//                 </DialogActions>
+//             </Dialog>
+//         </>
+//     );
+// }
+
+
+// export default Aprofile;
+
+
+
 import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-    Grid,
-    Box,
-    Avatar,
-    Typography,
-    IconButton,
-    Link,
-    Paper,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Button,
-    TextField,
-    Divider
-} from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import PhoneIcon from "@mui/icons-material/Phone";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import InfoIcon from "@mui/icons-material/Info";
+  FiEdit,
+  FiPhone,
+  FiMapPin,
+  FiInfo,
+  FiX,
+} from "react-icons/fi";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Aheader from "../Header/Aheader";
 
 function Aprofile() {
-    const navigate = useNavigate();
-    const storedUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
-    const [user, setUser] = useState(storedUser);
+  const navigate = useNavigate();
+  const storedUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
+  const [user, setUser] = useState(storedUser);
 
-    const [profilePic, setProfilePic] = useState(user?.profile_photo || "");
-    const [openEditProfile, setOpenEditProfile] = useState(false);
-    const [openChangePassword, setOpenChangePassword] = useState(false);
+  const [profilePic, setProfilePic] = useState(
+    user?.profile_photo || ""
+  );
 
-    const [name, setName] = useState(user?.name || "");
-    const [email, setEmail] = useState(user?.email || "");
-    const [phone, setPhone] = useState(user?.phone || "");
-    const [city, setCity] = useState(user?.city || "");
-    const [bio, setBio] = useState(user?.bio || "");
+  const [openEditProfile, setOpenEditProfile] = useState(false);
+  const [openChangePassword, setOpenChangePassword] =
+    useState(false);
 
-    const [newPassword, setNewPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [passwordError, setPasswordError] = useState("");
-    const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [name, setName] = useState(user?.name || "");
+  const [email, setEmail] = useState(user?.email || "");
+  const [phone, setPhone] = useState(user?.phone || "");
+  const [city, setCity] = useState(user?.city || "");
+  const [bio, setBio] = useState(user?.bio || "");
 
-    const fileInputRef = useRef();
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-    // ✅ Trigger file input for photo change
-    const handleEditPhoto = () => {
-        fileInputRef.current.click();
-    };
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] =
+    useState("");
 
-    const handleFileChange = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+  const fileInputRef = useRef();
 
-        const formData = new FormData();
-        formData.append("profilePhoto", file);
-        formData.append("email", user.email);
+  // Trigger file input
+  const handleEditPhoto = () => {
+    fileInputRef.current.click();
+  };
 
-        try {
-            const response = await axios.put(
-                "http://localhost:5000/api/auth/update-profile-pic",
-                formData,
-                { headers: { "Content-Type": "multipart/form-data" } }
-            );
+  // Upload profile photo
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-            if (response.data.success) {
-                const imageUrl = response.data.profile_photo;
+    const formData = new FormData();
+    formData.append("profilePhoto", file);
+    formData.append("email", user.email);
 
-                setProfilePic(imageUrl);
-
-                const updatedUser = { ...user, profile_photo: imageUrl };
-                sessionStorage.setItem("loggedInUser", JSON.stringify(updatedUser));
-                setUser(updatedUser);
-
-                toast.success("Profile photo updated successfully!");
-            } else {
-                toast.error(response.data.message || "Failed to update profile photo.");
-            }
-        } catch (error) {
-            toast.error(error.response?.data?.message || "Failed to update profile photo.");
+    try {
+      const response = await axios.put(
+        "http://localhost:5000/api/auth/update-profile-pic",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
-    };
+      );
 
-    // ✅ Validate and update profile info
-    const handleProfileUpdate = async () => {
+      if (response.data.success) {
+        const imageUrl = response.data.profile_photo;
+
+        setProfilePic(imageUrl);
+
+        const updatedUser = {
+          ...user,
+          profile_photo: imageUrl,
+        };
+
+        sessionStorage.setItem(
+          "loggedInUser",
+          JSON.stringify(updatedUser)
+        );
+
+        setUser(updatedUser);
+
+        toast.success(
+          "Profile photo updated successfully!"
+        );
+      } else {
+        toast.error(
+          response.data.message ||
+            "Failed to update profile photo."
+        );
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to update profile photo."
+      );
+    }
+  };
+
+  // Update profile
+  const handleProfileUpdate = async () => {
     if (!name || !email) {
-        toast.error("Name and Email are required");
-        return;
+      toast.error("Name and Email are required");
+      return;
     }
 
     try {
-        const response = await axios.put(
-            "http://localhost:5000/api/auth/update-profile",
-            { name, email, phone, city, bio },
-            { headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` } }
+      const response = await axios.put(
+        "http://localhost:5000/api/auth/update-profile",
+        { name, email, phone, city, bio },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem(
+              "token"
+            )}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        const updatedUser = response.data.user;
+
+        sessionStorage.setItem(
+          "loggedInUser",
+          JSON.stringify(updatedUser)
         );
 
-        if (response.data.success) {
-            const updatedUser = response.data.user; // ✅ get updated user from backend
+        setUser(updatedUser);
 
-            // ✅ Update local state & sessionStorage
-            sessionStorage.setItem("loggedInUser", JSON.stringify(updatedUser));
-            setUser(updatedUser);
+        setOpenEditProfile(false);
 
-            setOpenEditProfile(false);
-            toast.success("Profile updated successfully!");
-        } else {
-            toast.error(response.data.message || "Failed to update profile.");
-        }
+        toast.success("Profile updated successfully!");
+      } else {
+        toast.error(
+          response.data.message ||
+            "Failed to update profile."
+        );
+      }
     } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to update profile.");
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to update profile."
+      );
     }
-};
+  };
 
+  // Change password
+  const handlePasswordChange = async () => {
+    if (!newPassword) {
+      setPasswordError("Password is required");
+      return;
+    } else if (newPassword.length < 6) {
+      setPasswordError(
+        "Password must be at least 6 characters"
+      );
+      return;
+    } else {
+      setPasswordError("");
+    }
 
-    // ✅ Validate and update password
-    const handlePasswordChange = async () => {
-        if (!newPassword) {
-            setPasswordError("Password is required");
-            return;
-        } else if (newPassword.length < 6) {
-            setPasswordError("Password must be at least 6 characters");
-            return;
-        } else {
-            setPasswordError("");
+    if (!confirmPassword) {
+      setConfirmPasswordError(
+        "Please confirm your password"
+      );
+      return;
+    } else if (confirmPassword !== newPassword) {
+      setConfirmPasswordError(
+        "Passwords do not match"
+      );
+      return;
+    } else {
+      setConfirmPasswordError("");
+    }
+
+    try {
+      const response = await axios.put(
+        "http://localhost:5000/api/auth/change-password",
+        {
+          email: user.email,
+          newPassword,
         }
+      );
 
-        if (!confirmPassword) {
-            setConfirmPasswordError("Please confirm your password");
-            return;
-        } else if (confirmPassword !== newPassword) {
-            setConfirmPasswordError("Passwords do not match");
-            return;
-        } else {
-            setConfirmPasswordError("");
-        }
+      if (response.data.success) {
+        setOpenChangePassword(false);
+        setNewPassword("");
+        setConfirmPassword("");
 
-        try {
-            const response = await axios.put("http://localhost:5000/api/auth/change-password", {
-                email: user.email,
-                newPassword
-            });
+        toast.success(
+          "Password changed successfully!"
+        );
+      } else {
+        toast.error(
+          response.data.message ||
+            "Failed to change password."
+        );
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to change password."
+      );
+    }
+  };
 
-            if (response.data.success) {
-                setOpenChangePassword(false);
-                setNewPassword("");
-                setConfirmPassword("");
-                toast.success("Password changed successfully!");
-            } else {
-                toast.error(response.data.message || "Failed to change password.");
-            }
-        } catch (error) {
-            toast.error(error.response?.data?.message || "Failed to change password.");
-        }
-    };
+  return (
+    <>
+      <Aheader />
 
-    return (
-        <>
-            <Aheader />
-            <Box sx={{ p: 4 }}>
-                <Paper
-                    elevation={4}
-                    sx={{
-                        p: 4,
-                        maxWidth: 1000,
-                        mx: "auto",
-                        borderRadius: 3,
-                        background: "linear-gradient(135deg, #f9f9f9, #ffffff)",
-                    }}
+      <div className="p-4 md:p-8">
+        <div className="max-w-5xl mx-auto rounded-3xl bg-gradient-to-br from-[#f9f9f9] to-white shadow-xl p-6 md:p-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+            
+            {/* LEFT SIDE */}
+            <div className="flex justify-center relative">
+              <img
+                src={
+                  profilePic || "/default-avatar.png"
+                }
+                alt="Profile"
+                className="w-[220px] h-[220px] rounded-full object-cover shadow-lg"
+              />
+
+              <button
+                onClick={handleEditPhoto}
+                className="absolute bottom-2 ml-20 bg-white shadow-2xl p-3 rounded-full hover:bg-gray-100 transition"
+              >
+                <FiEdit className="text-blue-600 text-lg" />
+              </button>
+
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={handleFileChange}
+              />
+            </div>
+
+            {/* RIGHT SIDE */}
+            <div>
+              <h1 className="text-4xl font-bold mb-1">
+                {name}
+              </h1>
+
+              <p className="text-gray-500 mb-5">
+                {email}
+              </p>
+
+              {/* Contact */}
+              <div className="flex flex-wrap items-center gap-3 mb-3">
+                <div className="flex items-center">
+                  <FiPhone className="text-blue-600 mr-2" />
+                  <span>
+                    {phone || "No phone added"}
+                  </span>
+                </div>
+
+                <div className="h-5 w-px bg-gray-300"></div>
+
+                <div className="flex items-center">
+                  <FiMapPin className="text-red-500 mr-2" />
+                  <span>
+                    {city || "No city added"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Bio */}
+              <div className="flex items-start mt-4">
+                <FiInfo className="text-gray-500 mr-2 mt-1" />
+
+                <p className="italic text-gray-600">
+                  {bio || "No bio added yet"}
+                </p>
+              </div>
+
+              {/* Links */}
+              <div className="flex gap-6 mt-8">
+                <button
+                  onClick={() =>
+                    setOpenEditProfile(true)
+                  }
+                  className="text-blue-600 hover:underline"
                 >
-                    <Grid container spacing={4} alignItems="center">
-                        {/* LEFT SIDE - Profile Picture */}
-                        <Grid item xs={12} sm={6} sx={{ display: "flex", justifyContent: "center", position: "relative" }}>
-                            <Avatar
-                                alt="Profile"
-                                src={profilePic || "/default-avatar.png"}
-                                sx={{ width: 220, height: 220, boxShadow: 3 }}
-                            />
-                            <IconButton
-                                color="primary"
-                                onClick={handleEditPhoto}
-                                sx={{
-                                    position: "absolute",
-                                    bottom: 10,
-                                    width: "50px",
-                                    marginLeft: "80px",
-                                    backgroundColor: "white",
-                                    boxShadow: 5,
-                                    "&:hover": { backgroundColor: "#f0f0f0" },
-                                }}
-                            >
-                                <EditIcon />
-                            </IconButton>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                ref={fileInputRef}
-                                style={{ display: "none" }}
-                                onChange={handleFileChange}
-                            />
-                        </Grid>
+                  Edit Profile
+                </button>
 
-                        {/* RIGHT SIDE - User Details */}
-                        <Grid item xs={12} sm={6}>
-                            <Typography variant="h4" fontWeight="bold" sx={{ mb: 1 }}>
-                                {name}
-                            </Typography>
-                            <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-                                {email}
-                            </Typography>
+                <button
+                  onClick={() =>
+                    setOpenChangePassword(true)
+                  }
+                  className="text-blue-600 hover:underline"
+                >
+                  Change Password
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-                            {/* Contact Info */}
-                            <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                                <PhoneIcon color="primary" sx={{ mr: 1 }} />
-                                <Typography variant="body1">
-                                    {phone || "No phone added"}
-                                </Typography>
-                                <Divider orientation="vertical" flexItem sx={{ mx: 2 }} />
-                                <LocationOnIcon color="error" sx={{ mr: 1 }} />
-                                <Typography variant="body1">
-                                    {city || "No city added"}
-                                </Typography>
-                            </Box>
+      {/* EDIT PROFILE MODAL */}
+      {openEditProfile && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 relative">
+            
+            <button
+              onClick={() =>
+                setOpenEditProfile(false)
+              }
+              className="absolute top-4 right-4"
+            >
+              <FiX size={22} />
+            </button>
 
-                            {/* Bio */}
-                            <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
-                                <InfoIcon color="action" sx={{ mr: 1 }} />
-                                <Typography variant="body2" fontStyle="italic">
-                                    {bio || "No bio added yet"}
-                                </Typography>
-                            </Box>
+            <h2 className="text-2xl font-semibold mb-6">
+              Edit Profile
+            </h2>
 
-                            {/* Links */}
-                            <Box sx={{ display: "flex", flexDirection: "row", gap: 3, mt: 3 }}>
-                                <Link underline="hover" variant="body1" onClick={() => setOpenEditProfile(true)} sx={{ cursor: "pointer" }}>
-                                    Edit Profile
-                                </Link>
-                                <Link underline="hover" variant="body1" onClick={() => setOpenChangePassword(true)} sx={{ cursor: "pointer" }}>
-                                    Change Password
-                                </Link>
-                            </Box>
-                        </Grid>
-                    </Grid>
-                </Paper>
-            </Box>
+            <div className="space-y-4">
+              <input
+                type="text"
+                placeholder="Name"
+                value={name}
+                onChange={(e) =>
+                  setName(e.target.value)
+                }
+                className="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+              />
 
-<Box sx={{ p: 4, pt: 0 }}>
-  <Paper
-    elevation={4}
-    sx={{
-      p: 4,
-      maxWidth: 1000,
-      mx: "auto",
-      borderRadius: 3,
-      background: "linear-gradient(135deg, #fdfdfd, #f4faff)",
-    }}
-  >
-    <Typography variant="h5" fontWeight="bold" color="#042439" sx={{ mb: 3 }}>
-     Your Earnings
-    </Typography>
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) =>
+                  setEmail(e.target.value)
+                }
+                className="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+              />
 
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        flexWrap: "wrap",
-      }}
-    >
-      {/* Earnings Info */}
-      <Box>
-        <Typography variant="body1" color="text.secondary">
-          Total Earnings
-        </Typography>
-        <Typography variant="h4" fontWeight="bold" color="#2e7d32">
-          ₹ {user?.total_earning || 0}
-        </Typography>
-      </Box>
+              <input
+                type="text"
+                placeholder="Phone"
+                value={phone}
+                onChange={(e) =>
+                  setPhone(e.target.value)
+                }
+                className="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+              />
 
-      {/* View Details Button */}
-      <Button
-        variant="contained"
-        className="w-fit"
-        sx={{
-          textTransform: "none",
-          backgroundColor: "#042439",
-          "&:hover": { backgroundColor: "#063456" },
-          mt: { xs: 5, sm: 2 },
-        }}
-        onClick={() => navigate("/instructor-earning")}
-      >
-        View Details
-      </Button>
-    </Box>
-  </Paper>
-</Box>
+              <input
+                type="text"
+                placeholder="City"
+                value={city}
+                onChange={(e) =>
+                  setCity(e.target.value)
+                }
+                className="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+              />
 
+              <textarea
+                rows={3}
+                placeholder="Bio"
+                value={bio}
+                onChange={(e) =>
+                  setBio(e.target.value)
+                }
+                className="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              ></textarea>
+            </div>
 
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() =>
+                  setOpenEditProfile(false)
+                }
+                className="px-5 py-2 rounded-lg border hover:bg-gray-100"
+              >
+                Cancel
+              </button>
 
-            {/* Edit Profile Dialog */}
-            <Dialog open={openEditProfile} onClose={() => setOpenEditProfile(false)}>
-                <DialogTitle>Edit Profile</DialogTitle>
-                <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
-                    <TextField
-                        label="Name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        fullWidth
-                    />
-                    <TextField
-                        label="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        fullWidth
-                    />
-                    <TextField
-                        label="Phone"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        fullWidth
-                    />
-                    <TextField
-                        label="City"
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        fullWidth
-                    />
-                    <TextField
-                        label="Bio"
-                        value={bio}
-                        onChange={(e) => setBio(e.target.value)}
-                        fullWidth
-                        multiline
-                        rows={3}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenEditProfile(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleProfileUpdate}>
-                        Save
-                    </Button>
-                </DialogActions>
-            </Dialog>
+              <button
+                onClick={handleProfileUpdate}
+                className="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-            {/* Change Password Dialog */}
-            <Dialog open={openChangePassword} onClose={() => setOpenChangePassword(false)}>
-                <DialogTitle>Change Password</DialogTitle>
-                <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
-                    <TextField
-                        label="New Password"
-                        type="password"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        error={!!passwordError}
-                        helperText={passwordError}
-                        fullWidth
-                    />
-                    <TextField
-                        label="Confirm New Password"
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        error={!!confirmPasswordError}
-                        helperText={confirmPasswordError}
-                        fullWidth
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenChangePassword(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handlePasswordChange}>
-                        Update
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </>
-    );
+      {/* CHANGE PASSWORD MODAL */}
+      {openChangePassword && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 relative">
+            
+            <button
+              onClick={() =>
+                setOpenChangePassword(false)
+              }
+              className="absolute top-4 right-4"
+            >
+              <FiX size={22} />
+            </button>
+
+            <h2 className="text-2xl font-semibold mb-6">
+              Change Password
+            </h2>
+
+            <div className="space-y-4">
+              <div>
+                <input
+                  type="password"
+                  placeholder="New Password"
+                  value={newPassword}
+                  onChange={(e) =>
+                    setNewPassword(e.target.value)
+                  }
+                  className="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                />
+
+                {passwordError && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {passwordError}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <input
+                  type="password"
+                  placeholder="Confirm New Password"
+                  value={confirmPassword}
+                  onChange={(e) =>
+                    setConfirmPassword(
+                      e.target.value
+                    )
+                  }
+                  className="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                />
+
+                {confirmPasswordError && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {confirmPasswordError}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() =>
+                  setOpenChangePassword(false)
+                }
+                className="px-5 py-2 rounded-lg border hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handlePasswordChange}
+                className="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+              >
+                Update
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }
-
 
 export default Aprofile;

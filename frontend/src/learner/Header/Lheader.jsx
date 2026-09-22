@@ -74,11 +74,11 @@ function LHeader() {
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
 
             {/* Notification Icon */}
-            <IconButton sx={{ color: "#fff" }}>
+            {/* <IconButton sx={{ color: "#fff" }}>
               <Badge badgeContent={3} color="error">
                 <NotificationsIcon />
               </Badge>
-            </IconButton>
+            </IconButton> */}
 
             {/* Desktop: Profile Avatar + Username */}
             <Box

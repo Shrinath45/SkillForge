@@ -18,6 +18,7 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 const pages = [
   { name: "Dashboard", path: "/instructor-dashboard" },
   { name: "My Courses", path: "/instructor-courses" },
+  
 ];
 
 function IHeader() {
@@ -82,11 +83,11 @@ function IHeader() {
           {/* Right Section */}
           <Box sx={{ display: "flex", alignItems: "center" }}>
             {/* Notification Icon */}
-            <IconButton sx={{ color: "#fff" }}>
+            {/* <IconButton sx={{ color: "#fff" }}>
               <Badge badgeContent={3} color="error">
                 <NotificationsIcon />
               </Badge>
-            </IconButton>
+            </IconButton> */}
 
             {/* Desktop: Profile Avatar + Username */}
             <Box

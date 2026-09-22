@@ -234,3 +234,48 @@ export const deleteCourse = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+// GET ENROLLED STUDENTS BY COURSE
+export const getEnrolledStudents = async (req, res) => {
+  try {
+    const { course_id } = req.params;
+
+    const [students] = await db.query(
+      `
+      SELECT 
+          u.user_id,
+          u.name,
+          u.email,
+          e.enrolled_at,
+
+          CASE
+              WHEN c.course_type = 'FREE' THEN 'FREE'
+              ELSE e.payment_status
+          END AS payment_status
+
+      FROM enrollments e
+
+      JOIN users u 
+      ON e.user_id = u.user_id
+
+      JOIN courses c 
+      ON e.course_id = c.course_id
+
+      WHERE e.course_id = ?
+      `,
+      [course_id]
+    );
+
+    res.status(200).json({
+      success: true,
+      students,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch enrolled students",
+    });
+  }
+};

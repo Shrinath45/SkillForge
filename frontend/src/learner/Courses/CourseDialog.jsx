@@ -152,6 +152,11 @@ const CourseDialog = ({ open, onClose, course }) => {
     checkEnroll();
   }, [course]);
 
+
+  const purchaseClick = async () => {
+    toast("We're working on the Purchased Courses feature. It will be available soon!")
+  }
+
   // ✅ Enroll Course
   const handleEnroll = async () => {
     if (enrolled) return;
@@ -257,7 +262,8 @@ const CourseDialog = ({ open, onClose, course }) => {
            <Button
             variant="contained"
             color={enrolled ? "success" : "primary"}
-            disabled={loading || enrolled}
+            onClick={purchaseClick}
+            // disabled={loading || enrolled}
           >
             Purchase
           </Button>
